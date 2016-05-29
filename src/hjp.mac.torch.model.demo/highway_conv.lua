@@ -15,7 +15,7 @@ function HighwayConv.conv(vec_size, max_sent, kernel_size, num_layers, bias, f)
   local inputs = {[1]=input}
 
   for i = 1, num_layers do        
-      -- Reshape for spatial convolution
+    -- Reshape for spatial convolution
     reshape1 = nn.Reshape(1, max_sent, vec_size, true)
     conv = cudnn.SpatialConvolution(1, vec_size, vec_size, kernel_size)
     pad = nn.Padding(3,kernel_size-1)
