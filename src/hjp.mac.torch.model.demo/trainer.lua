@@ -23,12 +23,14 @@ function Trainer:train(train_data, train_labels, model, criterion, optim_method,
 
   local config -- for optim
   if opt.optim_method == 'adadelta' then
+    -- How to set the both parameters? -- 
     config = { rho = 0.95, eps = 1e-6 } 
   elseif opt.optim_method == 'adam' then
     config = {}
   end
 
   -- shuffle batches
+  -- Note that floor() function.
   local num_batches = math.floor(train_size / opt.batch_size)
   local shuffle = torch.randperm(num_batches)
   for i = 1, shuffle:size(1) do
@@ -57,6 +59,7 @@ function Trainer:train(train_data, train_labels, model, criterion, optim_method,
 
       -- forward pass
       local outputs = model:forward(inputs)
+      -- How to calculate err? --
       local err = criterion:forward(outputs, targets)
 
       -- track errors and confusion
@@ -75,6 +78,7 @@ function Trainer:train(train_data, train_labels, model, criterion, optim_method,
         layers.w2v.gradWeight:zero()
       elseif opt.model_type == 'multichannel' then
         -- keep one embedding channel static
+        -- Another channel will be updated. In our experiments, it will have character embedding etc. --
         layers.chan1.gradWeight:zero()
       end
 

@@ -53,6 +53,7 @@ cmd:option('-highway_mlp', 0, 'Number of highway MLP layers')
 cmd:option('-highway_conv_layers', 0, 'Number of highway MLP layers')
 cmd:text()
 
+-- Return the name layer, to get embedding in this part. --
 function get_layer(model, name)
   local named_layer
   function get(layer)
@@ -134,6 +135,8 @@ function train_loop(all_train, all_train_label, test, test_label, dev, dev_label
     print()
     print('==> fold ', fold)
 
+    --[[
+    -- Comment this part of the code for data set which has train, dev and test. --
     -- This part code can be used for our model. --
     if opt.has_test == 0 and opt.train_only == 0 then
       -- make train/test data (90/10 split for train/test)
@@ -141,6 +144,7 @@ function train_loop(all_train, all_train_label, test, test_label, dev, dev_label
       -- Cross validation split. --
       local i_start = math.floor((fold - 1) * (N / opt.folds) + 1)
       local i_end = math.floor(fold * (N / opt.folds))
+      -- What's the narrow() function? --
       test = all_train:narrow(1, i_start, i_end - i_start + 1)
       test_label = all_train_label:narrow(1, i_start, i_end - i_start + 1)
       train = torch.cat(all_train:narrow(1, 1, i_start), all_train:narrow(1, i_end, N - i_end + 1), 1)
@@ -166,7 +170,7 @@ function train_loop(all_train, all_train_label, test, test_label, dev, dev_label
       train = train:narrow(1, 1, train_size)
       train_label = train_label:narrow(1, 1, train_size)
     end
-
+    --]]
     -- build model
     local model, criterion, layers = build_model(w2v)
 
@@ -187,6 +191,7 @@ function train_loop(all_train, all_train_label, test, test_label, dev, dev_label
       -- Train
       local train_err = trainer:train(train, train_label, model, criterion, optim_method, layers, state, params, grads)
       -- Dev
+      -- Obtain best train model in development set. --
       local dev_err = trainer:test(dev, dev_label, model, criterion)
       if dev_err > best_err then
         best_model = model:clone()
@@ -257,7 +262,8 @@ end
 function main()
   -- parse arguments
   opt = cmd:parse(arg)
-
+  
+  -- Why does use a random number in neural networks? --
   if opt.seed ~= -1 then
     torch.manualSeed(opt.seed)
   end
@@ -274,7 +280,7 @@ function main()
   local test, test_label
   local dev, dev_label
   local w2v
-  --load data from the preprocessing file.--
+  -- Load data from the preprocessing file. --
   train, train_label, test, test_label, dev, dev_label, w2v = load_data()
 
   opt.vocab_size = w2v:size(1)
@@ -299,6 +305,7 @@ function main()
     end
   end
 
+  -- Using a trained model for testing. --
   if opt.test_only == 1 then
     assert(opt.warm_start_model ~= '', 'must have -warm_start_model for testing')
     assert(opt.has_test == 1)
@@ -340,6 +347,7 @@ function main()
   end
   print('saving results to ', savefile)
 
+  -- Begin to store results and parameters in save file. --
   local save = {}
   save['dev_scores'] = fold_dev_scores
   if opt.train_only == 0 then

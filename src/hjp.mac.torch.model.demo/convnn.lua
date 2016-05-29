@@ -44,6 +44,7 @@ function ModelBuilder:make_net(w2v)
     local conv
     local conv_layer
     local max_time
+    
     if opt.cudnn == 1 then
       conv = cudnn.SpatialConvolution(1, opt.num_feat_maps, opt.vec_size, kernels[i])
       if opt.model_type == 'multichannel' then
