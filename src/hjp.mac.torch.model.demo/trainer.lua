@@ -67,6 +67,7 @@ function Trainer:train(train_data, train_labels, model, criterion, optim_method,
 
       -- compute gradients
       local df_do = criterion:backward(outputs, targets)
+      -- Backword for error propagation. --
       model:backward(inputs, df_do)
 
       if opt.model_type == 'static' then
