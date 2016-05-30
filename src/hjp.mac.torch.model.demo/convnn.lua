@@ -10,12 +10,15 @@ function ModelBuilder:make_net(w2v)
     require 'cunn'
   end
 
+  -- What's the function of nn.Identity()()? --
   local input = nn.Identity()()
 
   local lookup
   if opt.model_type == 'multichannel' then
     local channels = {}
+    -- Two channels will be inserted into channels table. --
     for i = 1, 2 do
+      -- What's the function of nn.LookupTable()? --
       local chan = nn.LookupTable(opt.vocab_size, opt.vec_size)
       chan.weight:copy(w2v)
       chan.weight[1]:zero()
@@ -33,7 +36,7 @@ function ModelBuilder:make_net(w2v)
     end
     -- padding should always be 0
     lookup.weight[1]:zero()
-
+    -- This step should be analyzed in detail. --
     lookup = lookup(input)
   end
 
@@ -45,8 +48,10 @@ function ModelBuilder:make_net(w2v)
     local conv_layer
     local max_time
     
+    -- GPU. --
     if opt.cudnn == 1 then
       conv = cudnn.SpatialConvolution(1, opt.num_feat_maps, opt.vec_size, kernels[i])
+      -- Multichannel. -- 
       if opt.model_type == 'multichannel' then
         local lookup_conv = {}
         for chan = 1, 2 do
@@ -57,7 +62,9 @@ function ModelBuilder:make_net(w2v)
         end
         conv_layer = nn.CAddTable()(lookup_conv)
         max_time = nn.Max(3)(cudnn.ReLU()(conv_layer))
+      -- No multichannel. --
       else
+        -- Highway_conv_layers. --
         if opt.highway_conv_layers > 0 then
           -- Highway conv layers
           local highway_conv = HighwayConv.conv(opt.vec_size, opt.max_sent, kernels[i], opt.highway_conv_layers)
@@ -65,6 +72,7 @@ function ModelBuilder:make_net(w2v)
             conv(nn.Reshape(1, opt.max_sent, opt.vec_size, true)(
             highway_conv(lookup))))
           max_time = nn.Max(3)(cudnn.ReLU()(conv_layer))
+        -- Not highway_conv_layers. --
         else
           conv_layer = nn.Reshape(opt.num_feat_maps, opt.max_sent-kernels[i]+1, true)(
             conv(
@@ -73,8 +81,10 @@ function ModelBuilder:make_net(w2v)
           max_time = nn.Max(3)(cudnn.ReLU()(conv_layer))
         end
       end
+    -- CPU. --
     else
       conv = nn.TemporalConvolution(opt.vec_size, opt.num_feat_maps, kernels[i])
+      -- Multichannel. --
       if opt.model_type == 'multichannel' then
         local lookup_conv = {}
         for chan = 1,2 do
@@ -82,13 +92,14 @@ function ModelBuilder:make_net(w2v)
         end
         conv_layer = nn.CAddTable()(lookup_conv)
         max_time = nn.Max(2)(nn.ReLU()(conv_layer)) -- max over time
+      -- Not multichannel. --
       else
         conv = nn.TemporalConvolution(opt.vec_size, opt.num_feat_maps, kernels[i])
         conv_layer = conv(lookup)
         max_time = nn.Max(2)(nn.ReLU()(conv_layer)) -- max over time
       end
     end
-
+    -- Initialization weight value. --
     conv.weight:uniform(-0.01, 0.01)
     conv.bias:zero()
     table.insert(layer1, max_time)
