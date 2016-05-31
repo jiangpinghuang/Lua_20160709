@@ -1,0 +1,66 @@
+---- Chap 31
+--int prim_read (lua_State *L) {
+--  if (nothing_to_read())
+--  return lua_yieldk(L, 0, 0, &prim_read);
+--  lua_pushstring(L, read_some_data());
+--  return 1;
+--}
+--
+--#include <pthread.h>
+--#include "lua.h"
+--typedef struct Proc {
+--  lua_State *L;
+--  pthread_t thread;
+--  pthread_cond_t cond;
+--  const char *channel;
+--  struct Proc *previous, *next;
+--} Proc;
+--
+--static Proc *searchmatch (const char *channel, Proc **list) {
+--  Proc *node = *list;
+--  if (node == NULL) return NULL; /* empty list? */
+--    do {
+--      if (strcmp(channel, node->channel) == 0) { /* match? */
+--        /* remove node from the list */
+--        if (*list == node) /* is this node the first element? */
+--          *list = (node->next == node) ? NULL : node->next;
+--          node->previous->next = node->next;
+--          node->next->previous = node->previous;
+--          return node;
+--      }
+--    node = node->next;
+--  } while (node != *list);
+--  return NULL; /* no match */
+--}
+--
+--static void *ll_thread (void *arg) {
+--  lua_State *L = (lua_State *)arg;
+--  luaL_openlibs(L); /* open standard libraries */
+--  luaL_requiref(L, "lproc", luaopen_lproc, 1);
+--  lua_pop(L, 1);
+--  if (lua_pcall(L, 0, 0, 0) != 0) /* call main chunk */
+--    fprintf(stderr, "thread error: %s", lua_tostring(L, -1));
+--  pthread_cond_destroy(&getself(L)->cond);
+--  lua_close(L);
+--  return NULL;
+--}
+--
+--static void registerlib (lua_State *L, const char *name,
+--lua_CFunction f) {
+--  lua_getglobal(L, "package");
+--  lua_getfield(L, -1, "preload"); /* get 'package.preload' */
+--  lua_pushcfunction(L, f);
+--  lua_setfield(L, -2, name); /* package.preload[name] = f */
+--  lua_pop(L, 2); /* pop 'package' and 'preload' tables */
+--}
+--static void openlibs (lua_State *L) {
+--  luaL_requiref(L, "_G", luaopen_base, 1);
+--  luaL_requiref(L, "package", luaopen_package, 1);
+--  lua_pop(L, 2); /* remove results from previous calls */
+--  registerlib(L, "io", luaopen_io);
+--  registerlib(L, "os", luaopen_os);
+--  registerlib(L, "table", luaopen_table);
+--  registerlib(L, "string", luaopen_string);
+--  registerlib(L, "math", luaopen_math);
+--  registerlib(L, "debug", luaopen_debug);
+--}
