@@ -1,4 +1,35 @@
 require 'nn'
+
+module = nn.Identity()
+mlp = nn.Identity()
+print(mlp:forward(torch.ones(5, 2)))
+
+pred_mlp = nn.Sequential()
+pred_mlp:add(nn.Linear(5, 4))
+pred_mlp:add(nn.Linear(4, 3))
+
+xy_mlp = nn.ParallelTable()
+xy_mlp:add(pred_mlp)
+xy_mlp:add(nn.Identity())
+
+mlp = nn.Sequential()
+mlp:add(xy_mlp)
+cr = nn.MSECriterion()
+cr_wrap = nn.CriterionTable(cr)
+mlp:add(cr_wrap)
+
+for i = 1, 100 do
+  x = torch.ones(5)
+  y = torch.Tensor(3)
+  y:copy(x:narrow(1, 1, 3))
+  err = mlp:forward{x, y}
+  print(err)
+  
+  mlp:zeroGradParameters()
+  mlp:backward({x, y})
+  mlp:updateParameters(0.05)
+end
+
 --[[
 --||Containers.||--
 
@@ -80,7 +111,7 @@ print(mlp:forward(input))
 --//////////////////////////////////////////--
 --[[
 --||Overview.||--
---]]
+
 -- A simple neural network (perceptron) with 10 inputs. --
 -- mlp = nn.Linear(10, 1)
 
@@ -141,12 +172,12 @@ function gradUpdate(mlp, x, y, criterion, learningRate, params, gradParams)
   -- adds the gradients to all the parameters at once
   params:add(-learningRate, gradParams)
 end
-
+--]]
 
 --//////////////////////////////////////////--
 --[[
 --||Transfer Function Layers.||--
---]]
+
 
 require 'gnuplot'
 -- HardTanh. --
@@ -166,3 +197,4 @@ go=torch.ones(100)
 gi=m:backward(ii,go)
 gnuplot.plot({'f(x)',ii,oo,'+-'},{'df/dx',ii,gi,'+-'})
 gnuplot.grid(true)
+--]]
