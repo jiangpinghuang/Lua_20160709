@@ -125,7 +125,7 @@ m = nn.MulConstant(10, true)
 print(m:forward(t))
 
 -- LogSoftMax --
-ii = torch.randn(10)
+ii = torch.randn(2)
 print(ii)
 m = nn.LogSoftMax()
 oo = m:forward(ii)
