@@ -12,8 +12,8 @@ cmd:text('Convolutional net for sentence classification')
 cmd:text()
 cmd:text('Options')
 cmd:option('-model_type', 'rand', 'Model type. Options: rand (randomly initialized word embeddings), static (pre-trained embeddings from word2vec, static during learning), nonstatic (pre-trained embeddings, tuned during learning), multichannel (two embedding channels, one static and one nonstatic)')
-cmd:option('-data', 'MR.hdf5', 'Training data and word2vec data')
-cmd:option('-cudnn', 0, 'Use cudnn and GPUs if set to 1, otherwise set to 0')
+cmd:option('-data', '/home/hjp/Workshop/Model/sct/MR.hdf5', 'Training data and word2vec data')
+cmd:option('-cudnn', 1, 'Use cudnn and GPUs if set to 1, otherwise set to 0')
 cmd:option('-seed', -1, 'random seed, set -1 for actual random')
 cmd:option('-folds', 10, 'number of folds to use. If test set provided, folds=1. max 10')
 cmd:option('-debug', 0, 'print debugging info including timing, confusions')
@@ -135,7 +135,7 @@ function train_loop(all_train, all_train_label, test, test_label, dev, dev_label
     print()
     print('==> fold ', fold)
 
-    --[[
+    
     -- Comment this part of the code for data set which has train, dev and test. --
     -- This part code can be used for our model. --
     if opt.has_test == 0 and opt.train_only == 0 then
@@ -170,7 +170,7 @@ function train_loop(all_train, all_train_label, test, test_label, dev, dev_label
       train = train:narrow(1, 1, train_size)
       train_label = train_label:narrow(1, 1, train_size)
     end
-    --]]
+    
     -- build model
     local model, criterion, layers = build_model(w2v)
 
@@ -337,13 +337,13 @@ function main()
   end
 
   -- make sure output directory exists
-  if not path.exists('results') then lfs.mkdir('results') end
+  -- if not path.exists('results') then lfs.mkdir('results') end
 
   local savefile
   if opt.savefile ~= '' then
     savefile = opt.savefile
   else
-    savefile = string.format('results/%s_model.t7', os.date('%Y%m%d_%H%M'))
+    savefile = string.format('/home/hjp/Workshop/Model/sct/results/eclipse%s_model.t7', os.date('%Y%m%d_%H%M'))
   end
   print('saving results to ', savefile)
 
