@@ -1,5 +1,16 @@
 require 'nn'
 
+module = nn.DepthConcat(dim)
+
+inputSize = 3
+outputSize = 2
+input = torch.randn(inputSize,7,7)
+mlp=nn.DepthConcat(1);
+mlp:add(nn.SpatialConvolutionMM(inputSize, outputSize, 1, 1))
+mlp:add(nn.SpatialConvolutionMM(inputSize, outputSize, 3, 3))
+mlp:add(nn.SpatialConvolutionMM(inputSize, outputSize, 4, 4))
+print(mlp:forward(input))
+
 module = nn.Identity()
 mlp = nn.Identity()
 print(mlp:forward(torch.ones(5, 2)))
