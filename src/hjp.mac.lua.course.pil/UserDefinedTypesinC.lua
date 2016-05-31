@@ -1,0 +1,17 @@
+----Chap29
+--
+--#include <limits.h>
+--#define BITS_PER_WORD (CHAR_BIT*sizeof(unsigned int))
+--#define I_WORD(i) ((unsigned int)(i) / BITS_PER_WORD)
+--#define I_BIT(i) (1 << ((unsigned int)(i) % BITS_PER_WORD))
+--
+--static int setarray (lua_State *L) {
+--  unsigned int mask;
+--  unsigned int *entry = getindex(L, &mask);
+--  luaL_checkany(L, 3);
+--  if (lua_toboolean(L, 3))
+--  *entry |= mask;
+--  else
+--  *entry &= ~mask;
+--  return 0;
+--}
