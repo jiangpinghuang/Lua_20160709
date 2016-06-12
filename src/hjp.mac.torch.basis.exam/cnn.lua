@@ -1,6 +1,6 @@
 require 'nn'
 
-str = "--------------------"
+print(string.rep('-', 80))
 
 print(str .. "CNN" .. str)
 cnn = nn.Sequential()
@@ -139,4 +139,4 @@ for i=1,#classes do
     print(classes[i], 100*class_performance[i]/1000 .. ' %')
 end
 
-print(str .. "End" .. str)
+print(string.rep('-', 80))
