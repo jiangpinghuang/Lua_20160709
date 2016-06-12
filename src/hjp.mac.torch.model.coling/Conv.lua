@@ -19,6 +19,8 @@ function Conv:__init(config)
     self.num_classes = 5
   elseif self.task == 'vid' then
     self.num_classes = 6
+  elseif self.task == 'pit' then      -- add pit task --
+    self.num_classes = 1
   else
     error("not possible task!")
   end
@@ -91,7 +93,7 @@ function Conv:trainCombineOnly(dataset)
       elseif self.task == 'others' then
         sim = dataset.labels[indices[i + j - 1]] + 1 
       else
-  error("not possible!")
+        error("not possible!")
       end
       local ceil, floor = math.ceil(sim), math.floor(sim)
       if ceil == floor then
@@ -143,6 +145,8 @@ function Conv:predictCombination(lsent, rsent)
     val = torch.range(1, 5, 1):dot(output:exp())
   elseif self.task == 'vid' then
     val = torch.range(0, 5, 1):dot(output:exp())
+  elseif self.task == 'pit' then                    -- add pit task --
+    val = torch.range(0, 1):dot(output:exp())     
   else
     error("not possible task")
   end
