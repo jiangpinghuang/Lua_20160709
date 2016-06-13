@@ -154,3 +154,125 @@ print(y)
 print(torch.isTensor(torch.randn(3,4)))
 print(torch.isTensor(torch.randn(3,4)[1]))
 print(torch.isTensor(torch.randn(3,4)[1][2]))
+
+-- byte(), char(), short() ...
+x = torch.Tensor(3):fill(3.14)
+print(x)
+print(x:type('torch.IntTensor'))
+print(x:int())
+
+-- query the size and structure
+x = torch.Tensor(4,5)
+print(x:nDimension())
+x = torch.Tensor(4,5):zero()
+print(x)
+
+-- gets the number of columns and rows
+print(x:size(2))
+print(x:size())
+print(x:size(1))
+
+-- returns the jump necessary to go from one element to the next one
+x = torch.Tensor(4,5):fill(1.0)
+print(x)
+-- elements in a column are contiguous in memory
+print(x:stride(2))
+-- we need here to jump the size of the column
+print(x:stride(1))
+print(x:stride())
+
+-- a tensor is a particular way of viewing a storage
+x = torch.Tensor(4,5)
+s = x:storage()
+for i = 1, s:size() do
+  s[i] = i
+end
+print(x)
+
+-- Return true iff the elements of the Tensor are contiguous in memory
+x = torch.randn(4,5)
+print(x:isContiguous())
+print(x)
+
+y = x:select(2,3)  
+print(y:isContiguous())
+print(y)
+print(y:stride())
+
+-- Return true iff the dimensions of the Tensor match the elements of the storage
+x = torch.Tensor(4,5)
+y = torch.LongStorage({4,5})
+z = torch.LongStorage({5,4,1})
+print(y)
+print(z)
+print(x:isSize(y))
+print(x:isSize(z))
+print(x:isSize(x:size()))
+
+-- Return true iff the dimensions of Tensor and the argument Tensor are exactly the same
+x = torch.Tensor(4,5)
+y = torch.Tensor(4,5)
+print(x:isSameSizeAs(y))
+y = torch.Tensor(4,6)
+print(x:isSameSizeAs(y))
+
+-- Returns the number of elements of a tensor
+x = torch.Tensor(4,5)
+print(x:nElement())
+
+-- Querying elements
+x = torch.Tensor(3,3)
+i = 0; x:apply(function() i = i + 1; return i end)
+print(x)
+print(x[2])
+print(x[2][3])
+print(x:select(1,2))
+print(x:select(2,2))
+print(x[{2,3}])
+print(x[torch.LongStorage{2,3}])
+print(x[torch.le(x,3)])
+
+-- Referencing a tensor to an existing tensor or chunk of memory
+y = torch.Storage(10)
+x = torch.Tensor()
+print(x:set(y, 1, 10))
+y = torch.Storage(10)
+x = torch.Tensor(y, 1, 10)
+print(y)
+print(x)
+
+-- self set tensor
+x = torch.Tensor(2,5):fill(3.14)
+print(x)
+y = torch.Tensor():set(x)
+print(y)
+print(y:zero())
+
+-- Return true iff the Tensor is set to the argument Tensor
+x = torch.Tensor(2,5)
+y = torch.Tensor()
+print(y:isSetTo(x))
+print(y:set(x))
+print(y:isSetTo(x))
+print(y:t():isSetTo(x))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
