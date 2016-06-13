@@ -137,7 +137,7 @@ print("Id: " .. id)
 for i = 1, num_epochs do
   local start = sys.clock()
   print('--------------- EPOCH ' .. i .. '--- -------------')
-  model:trainCombineOnly(train_dataset)
+  model:trainCombineOnly(train_dataset)                     -- it cost much time at each epoch --
   print('Finished epoch in ' .. ( sys.clock() - start) )
   
   local dev_predictions = model:predict_dataset(dev_dataset)
