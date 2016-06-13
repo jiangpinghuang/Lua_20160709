@@ -1,5 +1,5 @@
 --[[
-  Training script for semantic relatedness prediction on the SICK dataset.
+  Training script for semantic relatedness prediction on the PIT dataset.
   We Thank Kai Sheng Tai for providing the preprocessing/basis codes. 
 --]]
 
@@ -11,19 +11,19 @@ require('xlua')
 require('sys')
 require('lfs')
 
-similarityMeasure = {}
+similarityMeasure = {}      -- The important data structure table {} didn't understood when I learned Lua --
 
-include('util/read_data.lua')
-include('util/Vocab.lua')
-include('Conv.lua')
-include('CsDis.lua')
+include('read_data.lua')    -- add all modules into similarityMeasure --
+include('Vocab.lua')        -- add all modules into similarityMeasure --
+include('Conv.lua')         -- add all modules into similarityMeasure --
+include('CsDis.lua')        -- add all modules into similarityMeasure --
 --include('PaddingReshape.lua')
 printf = utils.printf
 
 -- global paths (modify if desired)
-similarityMeasure.data_dir        = 'data'
-similarityMeasure.models_dir      = 'trained_models'
-similarityMeasure.predictions_dir = 'predictions'
+similarityMeasure.data_dir        = '/home/hjp/Workshop/Model/tsc/data'
+similarityMeasure.models_dir      = '/home/hjp/Workshop/Model/tsc/trained_models'
+similarityMeasure.predictions_dir = '/home/hjp/Workshop/Model/tsc/predictions'
 
 function header(s)
   print(string.rep('-', 80))
@@ -40,7 +40,7 @@ end
 
 -- read command line arguments
 local args = lapp [[
-Training script for semantic relatedness prediction on the SICK dataset.
+Training script for semantic relatedness prediction on the PIT dataset.
   -m,--model  (default dependency) Model architecture: [dependency, lstm, bilstm]
   -l,--layers (default 1)          Number of layers (ignored for Tree-LSTM)
   -d,--dim    (default 150)        LSTM memory dimension
@@ -56,7 +56,7 @@ torch.seed()
 print('<torch> using the automatic seed: ' .. torch.initialSeed())
 
 -- directory containing dataset files
-local data_dir = 'data/sick/'
+local data_dir = '/home/hjp/Workshop/Model/tsc/data/pit/'
 
 -- load vocab
 local vocab = similarityMeasure.Vocab(data_dir .. 'vocab-cased.txt')
@@ -64,43 +64,43 @@ local vocab = similarityMeasure.Vocab(data_dir .. 'vocab-cased.txt')
 -- load embeddings
 print('loading word embeddings')
 
-local emb_dir = 'data/glove/'
+local emb_dir = '/home/hjp/Workshop/Model/tsc/data/glove/'
 local emb_prefix = emb_dir .. 'glove.840B'
-local emb_vocab, emb_vecs = similarityMeasure.read_embedding(emb_prefix .. '.vocab', emb_prefix .. '.300d.th')
+local emb_vocab, emb_vecs = similarityMeasure.read_embedding(emb_prefix .. '.vocab', emb_prefix .. '.300d.th')  -- read_data.lua and Vocab.lua describes the function of read_embedding() --
 
-local emb_dim = emb_vecs:size(2)
+local emb_dim = emb_vecs:size(2)  -- emb_vecs represents embedding matrix, size() means row * column, so size(2) is the dimension of vector --
 
 -- use only vectors in vocabulary (not necessary, but gives faster training)
 local num_unk = 0
 local vecs = torch.Tensor(vocab.size, emb_dim)
-for i = 1, vocab.size do
+for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words which distinguished lower and upper case letter -- 
   local w = vocab:token(i)
   if emb_vocab:contains(w) then
-    vecs[i] = emb_vecs[emb_vocab:index(w)]
+    vecs[i] = emb_vecs[emb_vocab:index(w)]    -- obtain the index of word w in emb_vacab, then read vector of this word via index --
   else
     num_unk = num_unk + 1
-    vecs[i]:uniform(-0.05, 0.05)
+    vecs[i]:uniform(-0.05, 0.05)  -- a value between -0.05 and 0.05 is given for each elements in vecs[i] --
   end
 end
 print('unk count = ' .. num_unk)
-emb_vocab = nil
-emb_vecs = nil
+emb_vocab = nil     -- clear -- 
+emb_vecs = nil      -- clear --
 collectgarbage()
-local taskD = 'sic'
+local taskD = 'pit'
 -- load datasets
 print('loading datasets')
 local train_dir = data_dir .. 'train/'
 local dev_dir = data_dir .. 'dev/'
 local test_dir = data_dir .. 'test/'
-local train_dataset = similarityMeasure.read_relatedness_dataset(train_dir, vocab, taskD)
-local dev_dataset = similarityMeasure.read_relatedness_dataset(dev_dir, vocab, taskD)
-local test_dataset = similarityMeasure.read_relatedness_dataset(test_dir, vocab, taskD)
+local train_dataset = similarityMeasure.read_relatedness_dataset(train_dir, vocab, taskD) -- read_data.lua implements the function --
+local dev_dataset = similarityMeasure.read_relatedness_dataset(dev_dir, vocab, taskD)     -- read_data.lua implements the function --
+local test_dataset = similarityMeasure.read_relatedness_dataset(test_dir, vocab, taskD)   -- read_data.lua implements the function --
 printf('num train = %d\n', train_dataset.size)
 printf('num dev   = %d\n', dev_dataset.size)
 printf('num test  = %d\n', test_dataset.size)
 
 -- initialize model
-local model = model_class{
+local model = model_class{      -- Conv.lua contains the element which model needs, the following are initialed with input --
   emb_vecs   = vecs,
   structure  = model_structure,
   num_layers = args.layers,
@@ -136,9 +136,9 @@ local id = 10005
 print("Id: " .. id)
 for i = 1, num_epochs do
   local start = sys.clock()
-  print('--------------- EPOCH ' .. i .. '--- -------------')
+  print('--------------- EPOCH ' .. i .. '--- -------------')  
   model:trainCombineOnly(train_dataset)                     -- it cost much time at each epoch --
-  print('Finished epoch in ' .. ( sys.clock() - start) )
+  print('Finished epoch in ' .. ( sys.clock() - start) )    -- better to print the time via dd:hh:mm:ss --
   
   local dev_predictions = model:predict_dataset(dev_dataset)
   local dev_score = pearson(dev_predictions, dev_dataset.labels)
