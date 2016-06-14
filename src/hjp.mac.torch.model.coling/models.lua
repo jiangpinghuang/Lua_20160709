@@ -6,7 +6,7 @@ function flexLookUpPoin(emb_vecs, poin_vecs)
   local vocaSize = emb_vecs:size(1)
   local Dim = emb_vecs:size(2)
   local featext = nn.Sequential()
-  local lookupPara=nn.ParallelTable()       
+  local lookupPara=nn.ParallelTable()             -- nn's modules must be studied recently --
   lookupPara:add(nn.LookupTable(vocaSize,Dim)) --numberWords*D
   lookupPara:add(nn.LookupTable(53,poinDim)) --numberWords*DPos
   featext:add(lookupPara)
@@ -99,14 +99,16 @@ function createModel(mdl, vocsize, Dsize, nout, KKw)
     local nhid1 = 250 --opt.nhid1 
     local nhid2 = 250 --opt.nhid2
     local NumFilter = D
-    local pR = 2 --opt.pR
+    local pR = 2 --opt.pR     -- if pR = 1, add(nn.PReLU()) --
     local layers=1
       
     if mdl == 'deepQueryRankingNgramSimilarityOnevsGroupMaxMinMeanLinearExDGpPoinPercpt' then
     dofile "PaddingReshape.lua"
     
     deepQuery=nn.Sequential()
-      D = Dsize 
+    D = Dsize 
+      
+    -- max part for comparing --  
     local incep1max = nn.Sequential()
     incep1max:add(nn.TemporalConvolution(D,NumFilter,1,dw))
       if pR == 1 then
@@ -144,7 +146,8 @@ function createModel(mdl, vocsize, Dsize, nout, KKw)
         incepMax:add(nn.Reshape(NumFilter,1))               
         combineDepth:add(incepMax)        
       end       
-            
+           
+      -- min part for comparing --  
       local incep1min = nn.Sequential()
       incep1min:add(nn.TemporalConvolution(D,NumFilter,1,dw))
       if pR == 1 then
@@ -181,6 +184,7 @@ function createModel(mdl, vocsize, Dsize, nout, KKw)
         combineDepth:add(incepMin)                  
       end  
       
+      -- mean part for comparing -- 
       local incep1mean = nn.Sequential()
       incep1mean:add(nn.TemporalConvolution(D,NumFilter,1,dw))
       if pR == 1 then

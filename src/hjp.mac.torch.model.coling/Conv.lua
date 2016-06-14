@@ -139,7 +139,7 @@ function Conv:predictCombination(lsent, rsent)
   local rinputs = self.emb_vecs:index(1, rsent:long()):double()
 
   local part2 = self.convModel:forward({linputs, rinputs})
-  local output = self.softMaxC:forward(part2)
+  local output = self.softMaxC:forward(part2)         -- print output for val --
   local val = -1.0
   if self.task == 'sic' then
     val = torch.range(1, 5, 1):dot(output:exp())
