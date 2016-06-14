@@ -32,7 +32,7 @@ function Conv:__init(config)
   self.criterion = nn.DistKLDivCriterion()
   
   ----------------------------------------Combination of ConvNets.
-  dofile 'models.lua'
+  dofile 'models.lua'     -- Opens the named file and executes its contents as a Lua chunk --
   print('<model> creating a fresh model')
   
   -- Type of model; Size of vocabulary; Number of output classes
