@@ -318,10 +318,50 @@ print(x)
 x[torch.lt(x,0)] = -2
 print(x)
 
+-- Tensor index(dim, index)
+x = torch.rand(5,5)
+print(x)
+y = x:index(1, torch.LongTensor{3,1})
+print(y)
+y:fill(1)
+print(x)
 
+x = torch.rand(5,5)
+print(x)
+y = torch.Tensor()
+y:index(x, 1, torch.LongTensor{3,1})  -- index(x, 1 or 2, torch.LongTensor{3,1}), 1 is row, 2 is column
+print(y)
 
+-- indexCopy(dim, index, tensor)
+print(x)
+z = torch.Tensor(2,5)
+z:select(1,1):fill(-1)
+z:select(1,2):fill(-2)
+print(z)
+x:indexCopy(1, torch.LongTensor{3,4}, z)
+print(x)
 
+-- indexAdd(dim, index, tensor)
+print(x)
+z = torch.Tensor(5,2)
+z:select(2,1):fill(-1)
+z:select(2,2):fill(-2)
+print(z)
+x:indexAdd(2,torch.LongTensor{5,1},z)
+print(x)
 
+a = torch.range(1,5)
+print(a)
+a:indexAdd(1, torch.LongTensor{1,1,3,3}, torch.range(1,4))
+print(a)
+
+-- indexFill(dim, index, val)
+x = torch.rand(5,5)
+print(x)
+x:indexFill(2, torch.LongTensor{1,2}, -10)
+print(x)
+
+-- page 21
 
 
 
