@@ -255,3 +255,86 @@ print(y:isSetTo(x))
 print(y:set(x))
 print(y:isSetTo(x))
 print(y:t():isSetTo(x))
+
+-- set storage
+s = torch.Storage(10):fill(1)
+sz = torch.LongStorage({2,5})
+x = torch.Tensor()
+x:set(s, 1, sz)
+print(x)
+x:zero()
+print(s)
+
+-- Copying and initializing
+x = torch.Tensor(4):fill(1)
+y = torch.Tensor(2,2):copy(x)
+print(x)
+print(y)
+x = torch.DoubleTensor(4):fill(3.14)
+print(x)
+x = torch.Tensor(4):zero()
+print(x)
+
+-- For method narrow, select and sub the returned tensor shares the same storage as the original
+x = torch.Tensor(5,6):zero()
+print(x)
+
+y = x:narrow(1,2,3)
+y:fill(1)
+print(y)
+print(x)
+
+x = torch.Tensor(5,6):zero()
+print(x)
+y = x:sub(2,4):fill(1)
+print(y)
+print(x)
+z = x:sub(2,4,3,4):fill(2)
+print(z)
+print(x)
+print(y)
+print(y:sub(-1,-1,3,4))
+
+x = torch.Tensor(5,6):zero()
+print(x)
+y = x:select(1,2):fill(2)
+print(y)
+print(x)
+z = x:select(2,5):fill(5)
+print(z)
+print(x)
+
+-- The indexing operator [] can be used to combine narrow/sub and select in a concise and efficient way.
+x = torch.Tensor(5,6):zero()
+print(x)
+x[{1,3}]=1
+print(x)
+x[{2,{2,4}}] = 2
+print(x)
+x[{{}, 4}] = -1
+print(x)
+x[{{},2}] = torch.range(1,5)
+print(x)
+x[torch.lt(x,0)] = -2
+print(x)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
