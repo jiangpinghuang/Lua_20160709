@@ -3,7 +3,7 @@ local Conv = torch.class('similarityMeasure.Conv')
 function Conv:__init(config)
   self.mem_dim       = config.mem_dim       or 150
   self.learning_rate = config.learning_rate or 0.01
-  self.batch_size    = config.batch_size    or 1 --25
+  self.batch_size    = config.batch_size    or 25--1 --25
   self.num_layers    = config.num_layers    or 1
   self.reg           = config.reg           or 1e-4
   self.structure     = config.structure     or 'lstm' -- {lstm, bilstm}
@@ -90,6 +90,8 @@ function Conv:trainCombineOnly(dataset)
       local sim  = -0.1
       if self.task == 'sic' or self.task == 'vid' then
         sim = dataset.labels[indices[i + j - 1]] * (self.num_classes - 1) + 1
+      elseif self.task == 'pit' then
+        sim = dataset.labels[indices[i + j - 1]] + 1 
       elseif self.task == 'others' then
         sim = dataset.labels[indices[i + j - 1]] + 1 
       else
