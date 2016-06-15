@@ -90,7 +90,7 @@ for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words
   if emb_vocab:contains(w) then
     vecs[i] = emb_vecs[emb_vocab:index(w)]    -- obtain the index of word w in emb_vacab, then read vector of this word via index --
   else
-    print(w)
+    --print(w)
     --ovf:write(w .."\n")
     num_unk = num_unk + 1
     vecs[i]:uniform(-0.05, 0.05)  -- a value between -0.05 and 0.05 is given for each elements in vecs[i] --
@@ -174,7 +174,7 @@ for i = 1, num_epochs do
     local predictions_file = torch.DiskFile(predictions_save_path, 'w')
     print('writing predictions to ' .. predictions_save_path)
     for i = 1, test_predictions:size(1) do
-      predictions_file:writeFloat(test_predictions[i])
+      predictions_file:writeFloat(test_predictions[i])    -- write float data into test_predictions -- 
     end
     predictions_file:close()
   end

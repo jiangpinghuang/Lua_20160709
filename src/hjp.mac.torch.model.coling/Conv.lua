@@ -1,5 +1,6 @@
 local Conv = torch.class('similarityMeasure.Conv')
 
+-- initialization configuration for the model -- 
 function Conv:__init(config)
   self.mem_dim       = config.mem_dim       or 150
   self.learning_rate = config.learning_rate or 0.01
