@@ -43,12 +43,15 @@ function Conv:__init(config)
   self.length = self.emb_dim
   self.convModel = createModel(modelName, 10000, self.length, self.num_classes, self.ngram)  
   self.softMaxC = self:ClassifierOOne()
-
+  print('self:')
+  print(self)
   ----------------------------------------
   local modules = nn.Parallel()
     :add(self.convModel) 
     :add(self.softMaxC) 
   self.params, self.grad_params = modules:getParameters()
+  print('self.params: ' .. self.params:norm())
+  --print('self.grad_params: ' .. self.grad_params)
   --print(self.params:norm())
   --print(self.convModel:parameters()[1][1]:norm())
   --print(self.softMaxC:parameters()[1][1]:norm())
@@ -90,7 +93,14 @@ function Conv:trainCombineOnly(dataset)
     for j = 1, batch_size do
       local sim  = -0.1
       if self.task == 'sic' or self.task == 'vid' then
+        print("i: " .. i)
+        print("j: " .. j)
+        print('i + j - 1: ' .. i + j - 1)
+        print("self.num_classes - 1: " .. self.num_classes - 1)
+        print("dataset.labels[indices[i + j - 1]]: " .. dataset.labels[indices[i + j - 1]])
+        print("sim: ")
         sim = dataset.labels[indices[i + j - 1]] * (self.num_classes - 1) + 1
+        print(sim)
       elseif self.task == 'pit' then
         sim = dataset.labels[indices[i + j - 1]] + 1 
       elseif self.task == 'others' then

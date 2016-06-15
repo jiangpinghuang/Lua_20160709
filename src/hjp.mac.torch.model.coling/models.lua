@@ -40,7 +40,7 @@ function flexLookUpPoin(emb_vecs, poin_vecs)
   deepM:add(paraQuery)
   return deepM
 end
-
+print('flexLookUpPoin')
 function flexLookUp(emb_vecs)
   if emb_vecs == nil then
   error("Not good!")
@@ -74,7 +74,7 @@ function flexLookUp(emb_vecs)
   deepM:add(paraQuery)  
   return deepM
 end
-
+print('flexLookUp')
 function createModel(mdl, vocsize, Dsize, nout, KKw)
     -- define model to train
     local network = nn.Sequential()
@@ -469,4 +469,4 @@ function createModel(mdl, vocsize, Dsize, nout, KKw)
       return deepQuery  
     end
 end
-
+print('createModel')

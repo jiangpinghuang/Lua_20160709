@@ -11,6 +11,9 @@ require('xlua')
 require('sys')
 require('lfs')
 
+require 'cutorch';
+require 'cunn';
+
 similarityMeasure = {}      -- The important data structure table {} didn't understood when I learned Lua --
 
 include('read_data.lua')    -- add all modules into similarityMeasure --
@@ -155,7 +158,7 @@ local id = 10005
 print("Id: " .. id)
 for i = 1, num_epochs do
   local start = sys.clock()
-  print('--------------- EPOCH ' .. i .. '--- -------------')  
+  print('--------------- EPOCH ' .. i .. '--- -------------') 
   model:trainCombineOnly(train_dataset)                     -- it cost much time at each epoch --
   print('Finished epoch in ' .. ( sys.clock() - start) )    -- better to print the time via dd:hh:mm:ss --
   

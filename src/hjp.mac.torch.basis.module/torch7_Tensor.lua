@@ -361,19 +361,206 @@ print(x)
 x:indexFill(2, torch.LongTensor{1,2}, -10)
 print(x)
 
--- page 21
+-- tensor gather(dim, index)
+x = torch.rand(5,5)
+print(x)
+y = x:gather(1, torch.LongTensor{{1,2,3,4,5},{2,3,4,5,1}})
+print(y)
+z = x:gather(2, torch.LongTensor{{1,2},{2,3},{3,4},{4,5},{5,1}})
+print(z)
 
+-- tensor scatter(dim, index, src|val)
+x = torch.rand(2,5)
+print(x)
+y = torch.zeros(3,5):scatter(1, torch.LongTensor{{1,2,3,1,1,},{3,1,1,2,3}},x)
+print(y)
+z = torch.zeros(2,4):scatter(2,torch.LongTensor{{1},{3}}, 1.23)
+print(z)
 
+-- tensor maskedSelect(mask)
+x = torch.range(1,12):double():resize(3,4)
+print(x)
+mask = torch.ByteTensor(2,6):bernoulli()
+print(mask)
+y = x:maskedSelect(mask)
+print(y)
+z = torch.DoubleTensor()
+z:maskedSelect(x, mask)
+print(z)
 
+-- tensor maskedCopy(mask, tensor)
+x = torch.range(1,8):double():resize(2,4)
+print(x)
+mask = torch.ByteTensor(1,8):bernoulli()
+print(mask)
+y = torch.DoubleTensor(2,4):fill(-1)
+print(y)
+y:maskedCopy(mask,x)
+print(y)
 
+-- maskedFill
+x = torch.range(1,4):double():resize(1,4)
+print(x)
+mask = torch.ByteTensor(2,2):bernoulli()
+print(mask)
+x:maskedFill(mask, -1)
+print(x)
 
+-- Search nonzero(tensor)
+x = torch.rand(4,4):mul(3):floor():int()
+print(x)
+print(torch.nonzero(x))
+print(x:nonzero())
+indices = torch.LongTensor()
+print(x.nonzero(indices, x))
+print(x:eq(2):nonzero())
 
+-- Expanding/Replicating/Squeezing tensors
+x = torch.rand(10,1)
+print(x)
+y = torch.expand(x,10,2)
+print(y)
+y:fill(1)
+print(y)
+print(x)
+i = 0; y:apply(function() i=i+1; return i end)    -- I can't understand it
+print(y)
+print(x)
 
+-- repeatTensor
+x = torch.rand(5)
+print(x)
+print(torch.repeatTensor(x,3,2))
+print(torch.repeatTensor(x,3,2,1))
 
+-- squeeze(dim)
+x = torch.rand(2,1,2,1,2)
+print(x)
+print(torch.squeeze(x))
+print(torch.squeeze(x,2))
 
+-- view([result,] tensor, sizes)
+x = torch.zeros(4)
+print(x:view(2,2))
+print(x:view(2,-1))
+print(x:view(torch.LongStorage{2,2}))
+print(x)
+x = torch.rand(2,3)
+print(x)
+print(x:view(6))
+print(x)
 
+-- viewAs()
+x = torch.zeros(4)
+y = torch.Tensor(2,2)
+print(x:viewAs(y))
 
+-- transpose
+x = torch.Tensor(3,4):zero()
+x:select(2,3):fill(7)
+print(x)
+y = x:transpose(1,2)
+print(y)
+y:select(2,3):fill(8)
+print(y)
+x = y:transpose(1,2)
+print(x)
 
+-- t()
+x = torch.Tensor(3,4):zero()
+x:select(2,3):fill(7)
+y = x:t()
+print(y)
+print(x)
 
+-- permute()
+x = torch.Tensor(3,4,2,5)
+print(x)
+print(x:size())
+y = x:permute(2,3,1,4)    -- I'm sorry, I can't understand it
+print(y:size())
 
+-- unfold()
+x = torch.Tensor(7)
+for i = 1, 7 do x[i] = i end
+print(x)
+print(x:unfold(1,3,1))  -- 3:column, 1:stripe for row
+print(x)
+print(x:unfold(1,4,2))
 
+-- Applying a function to a tensor
+i = 0
+z = torch.Tensor(3,3)
+z:apply(function(x)
+  i = i + 1
+  return i
+end)
+print(z)
+z:apply(math.sin)
+print(z)
+sum = 0
+z:apply(function(x) sum = sum + x end)
+print(sum)
+print(z:sum())
+print(z:mean())
+x = torch.randn(4)
+print(x)
+print(x:mean())
+
+-- map
+x = torch.Tensor(3,3)
+y = torch.Tensor(9)
+i = 0
+x:apply(function() i = i + 1; return i end)
+i = 0
+y:apply(function() i = i + 1; return i end)
+print(x)
+print(y)
+x:map(y, function(xx, yy) return xx * yy end)
+print(x)
+
+-- map2
+x = torch.Tensor(3,3)
+y = torch.Tensor(9)
+z = torch.Tensor(3,3)
+i = -1; x:apply(function() i = i + 1; return math.cos(i)*math.cos(i) end)
+i = 0; y:apply(function() i = i + 1; return i end)
+i = 0; z:apply(function() i = i + 1; return i end)
+print(x)
+print(y)
+print(z)
+x:map2(y, z, function(xx, yy, zz) return xx+yy*zz end)
+print(x)
+
+-- split()
+x = torch.randn(3,4,5)
+print(x)
+print(x:split(2,1))   -- I still don't understand it
+print(x:split(5,2))
+print(x:split(2,3))
+print(x:split(2,3)[3])
+
+-- chunk
+x = torch.randn(3,4,5)
+print(x)
+print(x:chunk(2,1))
+print(x:chunk(2,2))
+print(x:chunk(2,3))
+
+-- LuaJIT FFI access
+t = torch.randn(3,2)
+print(t)
+t_data = torch.data(t)
+print(t_data)
+for i = 0, t:nElement()-1 do t_data[i] = 0 end
+print(t)
+
+t = torch.randn(3,2)
+t_noncontiguous = t:transpose(1,2)
+t_tran_and_con = t_noncontiguous:contiguous()
+data = torch.data(t_tran_and_con)
+t = torch.randn(10)
+p = tonumber(torch.data(t, true))
+s = torch.Storage(10, p)
+tt = torch.Tensor(s)
+print(tt)
