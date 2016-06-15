@@ -17,6 +17,10 @@ include('read_data.lua')    -- add all modules into similarityMeasure --
 include('Vocab.lua')        -- add all modules into similarityMeasure --
 include('Conv.lua')         -- add all modules into similarityMeasure --
 include('CsDis.lua')        -- add all modules into similarityMeasure --
+-- print similarityMeasure --
+print('first')
+print(similarityMeasure)
+
 --include('PaddingReshape.lua')
 printf = utils.printf
 
@@ -24,6 +28,9 @@ printf = utils.printf
 similarityMeasure.data_dir        = '/home/hjp/Workshop/Model/tsc/data'
 similarityMeasure.models_dir      = '/home/hjp/Workshop/Model/tsc/trained_models'
 similarityMeasure.predictions_dir = '/home/hjp/Workshop/Model/tsc/predictions'
+
+-- print similarityMeasure --
+print(similarityMeasure)
 
 function header(s)
   print(string.rep('-', 80))
@@ -69,8 +76,13 @@ local emb_prefix = emb_dir .. 'glove.840B'
 local emb_vocab, emb_vecs = similarityMeasure.read_embedding(emb_prefix .. '.vocab', emb_prefix .. '.300d.th')  -- read_data.lua and Vocab.lua describes the function of read_embedding() --
 
 local emb_dim = emb_vecs:size(2)  -- emb_vecs represents embedding matrix, size() means row * column, so size(2) is the dimension of vector --
-
+print('row:')
+print(emb_vecs:size(1))
+print('column:')
+print(emb_vecs:size(2))
 -- use only vectors in vocabulary (not necessary, but gives faster training)
+local oov_file = '/home/hjp/Downloads/oov.txt'
+--ovf = io.open(oov_file, "a")
 local num_unk = 0
 local vecs = torch.Tensor(vocab.size, emb_dim)
 for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words which distinguished lower and upper case letter -- 
@@ -78,15 +90,19 @@ for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words
   if emb_vocab:contains(w) then
     vecs[i] = emb_vecs[emb_vocab:index(w)]    -- obtain the index of word w in emb_vacab, then read vector of this word via index --
   else
+    --print(w)
+    --ovf:write(w .."\n")
     num_unk = num_unk + 1
     vecs[i]:uniform(-0.05, 0.05)  -- a value between -0.05 and 0.05 is given for each elements in vecs[i] --
   end
 end
+print('vocab.size = ' .. vocab.size)
 print('unk count = ' .. num_unk)
+print('oov rate = ' .. num_unk / vocab.size)  -- oov_rate = 13.466621484243%
 emb_vocab = nil     -- clear -- 
 emb_vecs = nil      -- clear --
 collectgarbage()
-local taskD = 'pit'
+local taskD = 'sic'
 -- load datasets
 print('loading datasets')
 local train_dir = data_dir .. 'train/'
@@ -107,6 +123,9 @@ local model = model_class{      -- Conv.lua contains the element which model nee
   mem_dim    = args.dim,
   task       = taskD,
 }
+
+print('model:')
+print(model)
 
 -- number of epochs to train
 local num_epochs = 30
@@ -155,7 +174,7 @@ for i = 1, num_epochs do
     local predictions_file = torch.DiskFile(predictions_save_path, 'w')
     print('writing predictions to ' .. predictions_save_path)
     for i = 1, test_predictions:size(1) do
-      predictions_file:writeFloat(test_predictions[i])
+      predictions_file:writeFloat(test_predictions[i])    -- write float data into test_predictions -- 
     end
     predictions_file:close()
   end
