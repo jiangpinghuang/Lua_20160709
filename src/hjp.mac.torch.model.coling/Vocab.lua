@@ -1,11 +1,8 @@
 --[[
-We Thank Kai Sheng Tai for providing the preprocessing codes. 
-
 A vocabulary object. Initialized from a file with one vocabulary token per line.
 Maps between vocabulary tokens and indices. If an UNK token is defined in the
 vocabulary, returns the index to this token if queried for an out-of-vocabulary
 token.
-
 --]]
 
 local Vocab = torch.class('similarityMeasure.Vocab')
