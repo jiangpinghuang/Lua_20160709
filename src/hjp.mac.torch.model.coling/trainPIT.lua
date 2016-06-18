@@ -1,6 +1,5 @@
 --[[
-  Training script for semantic relatedness prediction on the PIT dataset.
-  We Thank Kai Sheng Tai for providing the preprocessing/basis codes. 
+  Training script for semantic relatedness prediction on the SemEval2015 task1 PIT data set.
 --]]
 
 require('torch')
@@ -11,26 +10,24 @@ require('xlua')
 require('sys')
 require('lfs')
 
-require 'cutorch';
-require 'cunn';
-
 similarityMeasure = {}      -- The important data structure table {} didn't understood when I learned Lua --
 
 include('read_data.lua')    -- add all modules into similarityMeasure --
 include('Vocab.lua')        -- add all modules into similarityMeasure --
 include('Conv.lua')         -- add all modules into similarityMeasure --
 include('CsDis.lua')        -- add all modules into similarityMeasure --
+
 -- print similarityMeasure --
 print('first')
 print(similarityMeasure)
 
---include('PaddingReshape.lua')
+-- include('PaddingReshape.lua')
 printf = utils.printf
 
 -- global paths (modify if desired)
-similarityMeasure.data_dir        = '/home/hjp/Workshop/Model/tsc/data'
-similarityMeasure.models_dir      = '/home/hjp/Workshop/Model/tsc/trained_models'
-similarityMeasure.predictions_dir = '/home/hjp/Workshop/Model/tsc/predictions'
+similarityMeasure.data_dir        = '/home/hjp/Workshop/Model/coling/data'
+similarityMeasure.models_dir      = '/home/hjp/Workshop/Model/coling/trained_models'
+similarityMeasure.predictions_dir = '/home/hjp/Workshop/Model/coling/predictions'
 
 -- print similarityMeasure --
 print(similarityMeasure)
@@ -62,11 +59,11 @@ model_class = similarityMeasure.Conv
 model_structure = model_name
 
 torch.seed()
---torch.manualSeed(-3.0753778015266e+18)
+-- torch.manualSeed(-3.0753778015266e+18)
 print('<torch> using the automatic seed: ' .. torch.initialSeed())
 
 -- directory containing dataset files
-local data_dir = '/home/hjp/Workshop/Model/tsc/data/pit/'
+local data_dir = '/home/hjp/Workshop/Model/coling/data/pit/'
 
 -- load vocab
 local vocab = similarityMeasure.Vocab(data_dir .. 'vocab-cased.txt')
@@ -74,7 +71,7 @@ local vocab = similarityMeasure.Vocab(data_dir .. 'vocab-cased.txt')
 -- load embeddings
 print('loading word embeddings')
 
-local emb_dir = '/home/hjp/Workshop/Model/tsc/data/glove/'
+local emb_dir = '/home/hjp/Workshop/Model/coling/data/glove/'
 local emb_prefix = emb_dir .. 'glove.840B'
 local emb_vocab, emb_vecs = similarityMeasure.read_embedding(emb_prefix .. '.vocab', emb_prefix .. '.300d.th')  -- read_data.lua and Vocab.lua describes the function of read_embedding() --
 
@@ -83,9 +80,10 @@ print('row:')
 print(emb_vecs:size(1))
 print('column:')
 print(emb_vecs:size(2))
+
 -- use only vectors in vocabulary (not necessary, but gives faster training)
 local oov_file = '/home/hjp/Downloads/oov.txt'
---ovf = io.open(oov_file, "a")
+-- ovf = io.open(oov_file, "a")
 local num_unk = 0
 local vecs = torch.Tensor(vocab.size, emb_dim)
 for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words which distinguished lower and upper case letter -- 
@@ -138,7 +136,6 @@ header('model configuration')
 printf('max epochs = %d\n', num_epochs)
 model:print_config()
 
-
 if lfs.attributes(similarityMeasure.predictions_dir) == nil then
   lfs.mkdir(similarityMeasure.predictions_dir)
 end
@@ -149,8 +146,8 @@ local best_dev_score = -1.0
 local best_dev_model = model
 
 -- threads
---torch.setnumthreads(4)
---print('<torch> number of threads in used: ' .. torch.getnumthreads())
+-- torch.setnumthreads(4)
+-- print('<torch> number of threads in used: ' .. torch.getnumthreads())
 
 header('Training model')
 
@@ -183,4 +180,3 @@ for i = 1, num_epochs do
   end
 end
 print('finished training in ' .. (sys.clock() - train_start))
-
