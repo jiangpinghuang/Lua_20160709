@@ -10,19 +10,19 @@ require('xlua')
 require('sys')
 require('lfs')
 
-similarityMeasure = {}      -- The important data structure table {} didn't understood when I learned Lua --
+similarityMeasure = {}      -- The important data structure table {} which wasn't understand when I learned Lua --
 
-include('read_data.lua')    -- add all modules into similarityMeasure --
-include('Vocab.lua')        -- add all modules into similarityMeasure --
-include('Conv.lua')         -- add all modules into similarityMeasure --
-include('CsDis.lua')        -- add all modules into similarityMeasure --
+include('read_data.lua')    -- add all modules and function into similarityMeasure --
+include('Vocab.lua')        -- add all modules and function into similarityMeasure --
+include('Conv.lua')         -- add all modules and function into similarityMeasure --
+include('CsDis.lua')        -- add all modules and function into similarityMeasure --
 
 -- print similarityMeasure --
 print('first')
 print(similarityMeasure)
 
 -- include('PaddingReshape.lua')
-printf = utils.printf
+printf = utils.printf       -- what's the utils?
 
 -- global paths (modify if desired)
 similarityMeasure.data_dir        = '/home/hjp/Workshop/Model/coling/data'
@@ -47,7 +47,7 @@ end
 
 -- read command line arguments
 local args = lapp [[
-Training script for semantic relatedness prediction on the PIT dataset.
+Training script for semantic relatedness prediction on the PIT data set.
   -m,--model  (default dependency) Model architecture: [dependency, lstm, bilstm]
   -l,--layers (default 1)          Number of layers (ignored for Tree-LSTM)
   -d,--dim    (default 150)        LSTM memory dimension
@@ -60,9 +60,9 @@ model_structure = model_name
 
 torch.seed()
 -- torch.manualSeed(-3.0753778015266e+18)
-print('<torch> using the automatic seed: ' .. torch.initialSeed())
+print('<torch> using the automatic seed: ' .. torch.initialSeed())      -- why does the model use an initial seed? --
 
--- directory containing dataset files
+-- directory containing data set files
 local data_dir = '/home/hjp/Workshop/Model/coling/data/pit/'
 
 -- load vocab
@@ -73,7 +73,7 @@ print('loading word embeddings')
 
 local emb_dir = '/home/hjp/Workshop/Model/coling/data/glove/'
 local emb_prefix = emb_dir .. 'glove.840B'
-local emb_vocab, emb_vecs = similarityMeasure.read_embedding(emb_prefix .. '.vocab', emb_prefix .. '.300d.th')  -- read_data.lua and Vocab.lua describes the function of read_embedding() --
+local emb_vocab, emb_vecs = similarityMeasure.read_embedding(emb_prefix .. '.vocab', emb_prefix .. '.300d.th')  -- both read_data.lua and Vocab.lua describe the function of read_embedding() --
 
 local emb_dim = emb_vecs:size(2)  -- emb_vecs represents embedding matrix, size() means row * column, so size(2) is the dimension of vector --
 print('row:')
@@ -82,13 +82,16 @@ print('column:')
 print(emb_vecs:size(2))
 
 -- use only vectors in vocabulary (not necessary, but gives faster training)
-local oov_file = '/home/hjp/Downloads/oov.txt'
+-- local oov_file = '/home/hjp/Downloads/oov.txt' --
 -- ovf = io.open(oov_file, "a")
 local num_unk = 0
 local vecs = torch.Tensor(vocab.size, emb_dim)
 for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words which distinguished lower and upper case letter -- 
   local w = vocab:token(i)
   if emb_vocab:contains(w) then
+    -- print(w)
+    -- print(emb_vocab:index(w))
+    -- print(emb_vecs[emb_vocab:index(w)])
     vecs[i] = emb_vecs[emb_vocab:index(w)]    -- obtain the index of word w in emb_vacab, then read vector of this word via index --
   else
     --print(w)
@@ -117,6 +120,9 @@ printf('num dev   = %d\n', dev_dataset.size)
 printf('num test  = %d\n', test_dataset.size)
 
 -- initialize model
+print('model:')
+print(model_class)
+print('123')
 local model = model_class{      -- Conv.lua contains the element which model needs, the following are initialed with input --
   emb_vecs   = vecs,
   structure  = model_structure,
@@ -124,7 +130,7 @@ local model = model_class{      -- Conv.lua contains the element which model nee
   mem_dim    = args.dim,
   task       = taskD,
 }
-
+print('abc')
 print('model:')
 print(model)
 

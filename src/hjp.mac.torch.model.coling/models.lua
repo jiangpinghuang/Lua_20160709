@@ -1,4 +1,6 @@
+-- flexLookUpPoin for msrp task
 function flexLookUpPoin(emb_vecs, poin_vecs)
+  print('flexLookUpPoin..........................................')
   if emb_vecs == nil or poin_vecs == nil then
   error("Not good!")
   end
@@ -49,6 +51,7 @@ function flexLookUp(emb_vecs)
   end
   
   local vocaSize = emb_vecs:size(1)
+  print('VocaSize: ' .. vocaSize)
   local Dim = emb_vecs:size(2)
   local featext = nn.Sequential()   
   featext:add(nn.LookupTable(vocaSize,Dim))
