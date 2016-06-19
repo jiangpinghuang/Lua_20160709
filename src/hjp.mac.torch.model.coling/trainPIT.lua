@@ -10,6 +10,7 @@ require('xlua')
 require('sys')
 require('lfs')
 
+
 similarityMeasure = {}      -- The important data structure table {} which wasn't understand when I learned Lua --
 
 include('read_data.lua')    -- add all modules and function into similarityMeasure --
@@ -100,6 +101,8 @@ for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words
     vecs[i]:uniform(-0.05, 0.05)  -- a value between -0.05 and 0.05 is given for each elements in vecs[i] --
   end
 end
+print('vecs: ')
+print(vecs)
 print('vocab.size = ' .. vocab.size)
 print('unk count = ' .. num_unk)
 print('oov rate = ' .. num_unk / vocab.size)  -- oov_rate = 13.466621484243%
@@ -166,6 +169,10 @@ for i = 1, num_epochs do
   print('Finished epoch in ' .. ( sys.clock() - start) )    -- better to print the time via dd:hh:mm:ss --
   
   local dev_predictions = model:predict_dataset(dev_dataset)
+  print('dev_predictions: ')
+  print(dev_predictions)
+  print('dev_dataset.labels: ')
+  print(dev_dataset.labels)
   local dev_score = pearson(dev_predictions, dev_dataset.labels)
   printf('-- dev score: %.5f\n', dev_score)
 

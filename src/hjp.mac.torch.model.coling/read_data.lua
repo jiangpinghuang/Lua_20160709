@@ -22,6 +22,10 @@ function similarityMeasure.read_sentences(path, vocab)
       local token = tokens[i]
       sent[i] = vocab:index(token)
     end
+    print('sent: ')
+    print(sent)
+    print("#sentences: ")
+    print(#sentences)
     sentences[#sentences + 1] = sent
   end
 
@@ -44,7 +48,7 @@ function similarityMeasure.read_relatedness_dataset(dir, vocab, task)
     if task == 'sic' then
       dataset.labels[i] = 0.25 * (sim_file:readDouble() - 1) -- sic data
     elseif task == 'vid' then
-  dataset.labels[i] = 0.2 * (sim_file:readDouble()) -- vid data
+      dataset.labels[i] = 0.2 * (sim_file:readDouble()) -- vid data
     else
       dataset.labels[i] = (sim_file:readDouble()) -- twi and msp
     end

@@ -65,7 +65,7 @@ function Conv:ClassifierOOne()
   local items = (ngram+1)*3     
   -- local items = (ngram+1) -- no Min and Mean
   local NumFilter = self.length -- 300
-  local conceptFNum = 20  
+  local conceptFNum = 20          -- the number of filter is 20 --
   inputNum = 2*items*items/3+NumFilter*items*items/3+6*NumFilter+(2+NumFilter)*2*ngram*conceptFNum --PoinPercpt model!
   modelQ1:add(nn.Linear(inputNum, self.sim_nhidden))
   modelQ1:add(nn.Tanh())  
@@ -93,12 +93,12 @@ function Conv:trainCombineOnly(dataset)
     for j = 1, batch_size do
       local sim  = -0.1
       if self.task == 'sic' or self.task == 'vid' then
-        print("i: " .. i)
-        print("j: " .. j)
-        print('i + j - 1: ' .. i + j - 1)
-        print("self.num_classes - 1: " .. self.num_classes - 1)
-        print("dataset.labels[indices[i + j - 1]]: " .. dataset.labels[indices[i + j - 1]])
-        print("sim: ")
+--        print("i: " .. i)
+--        print("j: " .. j)
+--        print('i + j - 1: ' .. i + j - 1)
+--        print("self.num_classes - 1: " .. self.num_classes - 1)
+--        print("dataset.labels[indices[i + j - 1]]: " .. dataset.labels[indices[i + j - 1]])
+--        print("sim: ")
         sim = dataset.labels[indices[i + j - 1]] * (self.num_classes - 1) + 1
         print(sim)
       elseif self.task == 'pit' then
@@ -114,7 +114,7 @@ function Conv:trainCombineOnly(dataset)
       else
         targets[{j, floor}] = ceil - sim
         targets[{j, ceil}] = sim - floor
-      end--]]
+      end
     end
     
     local feval = function(x)
@@ -153,6 +153,14 @@ function Conv:predictCombination(lsent, rsent)
 
   local part2 = self.convModel:forward({linputs, rinputs})
   local output = self.softMaxC:forward(part2)         -- print output for val --
+  print("output: ")
+  print(output)
+  print("output:exp(): ")
+  print(output:exp())
+  print("torch.range(1,5,1): ")
+  print(torch.range(1,5,1))
+  print("torch.range(1, 5, 1):dot(output:exp()): ")
+  print(torch.range(1, 5, 1):dot(output:exp()))
   local val = -1.0
   if self.task == 'sic' then
     val = torch.range(1, 5, 1):dot(output:exp())
