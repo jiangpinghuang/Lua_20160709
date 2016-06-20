@@ -128,7 +128,7 @@ print(model_class)
 print('123')
 local model = model_class{      -- Conv.lua contains the element which model needs, the following are initialed with input --
   emb_vecs   = vecs,
-  structure  = model_structure,
+  structure  = model_structure, -- 'convOnly'
   num_layers = args.layers,
   mem_dim    = args.dim,
   task       = taskD,
