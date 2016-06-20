@@ -126,14 +126,14 @@ function Conv:trainCombineOnly(dataset)
         local linputs = self.emb_vecs:index(1, lsent:long()):double()
         local rinputs = self.emb_vecs:index(1, rsent:long()):double()
         
-    local part2 = self.convModel:forward({linputs, rinputs})
-    local output = self.softMaxC:forward(part2)
+        local part2 = self.convModel:forward({linputs, rinputs})
+        local output = self.softMaxC:forward(part2)
 
         loss = self.criterion:forward(output, targets[1])
         train_looss = loss + train_looss
         local sim_grad = self.criterion:backward(output, targets[1])
-    local gErrorFromClassifier = self.softMaxC:backward(part2, sim_grad)
-    self.convModel:backward({linputs, rinputs}, gErrorFromClassifier)
+        local gErrorFromClassifier = self.softMaxC:backward(part2, sim_grad)
+        self.convModel:backward({linputs, rinputs}, gErrorFromClassifier)
       end
       -- regularization
       loss = loss + 0.5 * self.reg * self.params:norm() ^ 2

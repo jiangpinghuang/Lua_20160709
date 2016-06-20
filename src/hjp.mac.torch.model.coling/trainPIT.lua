@@ -183,7 +183,7 @@ for i = 1, num_epochs do
     printf('[[BEST DEV]]-- test score: %.4f\n', pearson(test_predictions, test_dataset.labels))
 
     local predictions_save_path = string.format(
-  similarityMeasure.predictions_dir .. '/results-%s.%dl.%dd.epoch-%d.%.5f.%d.pred', args.model, args.layers, args.dim, i, test_sco, id)
+    similarityMeasure.predictions_dir .. '/results-%s.%dl.%dd.epoch-%d.%.5f.%d.pred', args.model, args.layers, args.dim, i, test_sco, id)
     local predictions_file = torch.DiskFile(predictions_save_path, 'w')
     print('writing predictions to ' .. predictions_save_path)
     for i = 1, test_predictions:size(1) do
