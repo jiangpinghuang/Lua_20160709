@@ -23,7 +23,7 @@ print('first')
 print(similarityMeasure)
 
 -- include('PaddingReshape.lua')
-printf = utils.printf       -- what's the utils?
+--printf = utils.printf       -- what's the utils?
 
 -- global paths (modify if desired)
 similarityMeasure.data_dir        = '/home/hjp/Workshop/Model/coling/data'
@@ -47,12 +47,12 @@ function pearson(x, y)
 end
 
 -- read command line arguments
-local args = lapp [[
-Training script for semantic relatedness prediction on the PIT data set.
-  -m,--model  (default dependency) Model architecture: [dependency, lstm, bilstm]
-  -l,--layers (default 1)          Number of layers (ignored for Tree-LSTM)
-  -d,--dim    (default 150)        LSTM memory dimension
-]]
+--local args = lapp [[
+--Training script for semantic relatedness prediction on the PIT data set.
+--  -m,--model  (default dependency) Model architecture: [dependency, lstm, bilstm]
+--  -l,--layers (default 1)          Number of layers (ignored for Tree-LSTM)
+--  -d,--dim    (default 150)        LSTM memory dimension
+--]]
 
 local model_name, model_class, model_structure
 model_name = 'convOnly'
@@ -101,8 +101,8 @@ for i = 1, vocab.size do    -- load vocab-cased.txt, the file contains all words
     vecs[i]:uniform(-0.05, 0.05)  -- a value between -0.05 and 0.05 is given for each elements in vecs[i] --
   end
 end
-print('vecs: ')
-print(vecs)
+--print('vecs: ')
+--print(vecs)
 print('vocab.size = ' .. vocab.size)
 print('unk count = ' .. num_unk)
 print('oov rate = ' .. num_unk / vocab.size)  -- oov_rate = 13.466621484243%
@@ -118,19 +118,19 @@ local test_dir = data_dir .. 'test/'
 local train_dataset = similarityMeasure.read_relatedness_dataset(train_dir, vocab, taskD) -- read_data.lua implements the function --
 local dev_dataset = similarityMeasure.read_relatedness_dataset(dev_dir, vocab, taskD)     -- read_data.lua implements the function --
 local test_dataset = similarityMeasure.read_relatedness_dataset(test_dir, vocab, taskD)   -- read_data.lua implements the function --
-printf('num train = %d\n', train_dataset.size)
-printf('num dev   = %d\n', dev_dataset.size)
-printf('num test  = %d\n', test_dataset.size)
+--printf('num train = %d\n', train_dataset.size)
+--printf('num dev   = %d\n', dev_dataset.size)
+--printf('num test  = %d\n', test_dataset.size)
 
 -- initialize model
 print('model:')
 print(model_class)
 print('123')
-local model = model_class{      -- Conv.lua contains the element which model needs, the following are initialed with input --
+local model = model_class{ -- Conv.lua contains the element which model needs, the following are initialed with input --
   emb_vecs   = vecs,
   structure  = model_structure, -- 'convOnly'
-  num_layers = args.layers,
-  mem_dim    = args.dim,
+  num_layers = 1,--args.layers,
+  mem_dim    = 150, --args.dim,
   task       = taskD,
 }
 print('abc')
@@ -142,7 +142,7 @@ local num_epochs = 30
 
 -- print information
 header('model configuration')
-printf('max epochs = %d\n', num_epochs)
+--printf('max epochs = %d\n', num_epochs)
 model:print_config()
 
 if lfs.attributes(similarityMeasure.predictions_dir) == nil then
@@ -174,13 +174,13 @@ for i = 1, num_epochs do
   print('dev_dataset.labels: ')
   print(dev_dataset.labels)
   local dev_score = pearson(dev_predictions, dev_dataset.labels)
-  printf('-- dev score: %.5f\n', dev_score)
+  --printf('-- dev score: %.5f\n', dev_score)
 
   if dev_score >= best_dev_score then
     best_dev_score = dev_score
     local test_predictions = model:predict_dataset(test_dataset)
     local test_sco = pearson(test_predictions, test_dataset.labels)
-    printf('[[BEST DEV]]-- test score: %.4f\n', pearson(test_predictions, test_dataset.labels))
+    --printf('[[BEST DEV]]-- test score: %.4f\n', pearson(test_predictions, test_dataset.labels))
 
     local predictions_save_path = string.format(
     similarityMeasure.predictions_dir .. '/results-%s.%dl.%dd.epoch-%d.%.5f.%d.pred', args.model, args.layers, args.dim, i, test_sco, id)
