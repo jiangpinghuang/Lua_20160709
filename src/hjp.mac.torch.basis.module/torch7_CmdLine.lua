@@ -10,8 +10,8 @@ cmd:option('-seed', 123, 'initial random seed')
 cmd:option('-booloption', false, 'boolean option')
 cmd:option('-stroption', 'mystring', 'string option')
 
-
 params = cmd:parse(arg)
+print(params)
 params.rundir = cmd:string('experiment', params, {dir=true})
 paths.mkdir(params.rundir)
 

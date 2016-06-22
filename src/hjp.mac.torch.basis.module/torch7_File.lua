@@ -1,5 +1,5 @@
 -- File
-require('torch')
+require 'torch'
 
 file = torch.MomoryFile()
 file:writeObject(object)
@@ -12,11 +12,11 @@ table.insert(array, x)
 table.insert(array, x)
 
 array[1][1] = 3.14
-file = torch.DiskFile('foo.asc', 'w')
+file = torch.DiskFile('/User/hjp/Downloads/a.txt', 'w')
 file:writeObject(array)
 file:close()
 
-file = torch.DiskFile('foo.asc', 'r')
+file = torch.DiskFile('/User/hjp/Downloads/a.txt', 'r')
 arrayNew = file:readObject()
 
 arrayNew[1][1] = 2.72
