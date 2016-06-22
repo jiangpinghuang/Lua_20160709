@@ -4,7 +4,7 @@ local Conv = torch.class('similarityMeasure.Conv')
 function Conv:__init(config)
   self.mem_dim       = config.mem_dim       or 150
   self.learning_rate = config.learning_rate or 0.01
-  self.batch_size    = config.batch_size    or 25     --1 --25
+  self.batch_size    = config.batch_size    or 5     --1 --25
   self.num_layers    = config.num_layers    or 1
   self.reg           = config.reg           or 1e-4
   self.structure     = config.structure     or 'lstm' -- {lstm, bilstm}
@@ -708,14 +708,14 @@ function Conv:trainCombineOnly(dataset)
         
         local part2 = self.convModel:forward({linputs, rinputs})
         local output = self.softMaxC:forward(part2)
-        print('linputs: ')
-        print(linputs)
-        print('rinputs: ')
-        print(rinputs)
-        print('part2: ')
-        print(part2)
-        print('output: ')
-        print(output)
+--        print('linputs: ')
+--        print(linputs)
+--        print('rinputs: ')
+--        print(rinputs)
+--        print('part2: ')
+--        print(part2)
+--        print('output: ')
+--        print(output)
         
         loss = self.criterion:forward(output, targets[1])
         print('targets[1]: ')
@@ -744,6 +744,8 @@ function Conv:predictCombination(lsent, rsent)
   local rinputs = self.emb_vecs:index(1, rsent:long()):double()
 
   local part2 = self.convModel:forward({linputs, rinputs})
+  print('part2: ')
+  print(part2)
   local output = self.softMaxC:forward(part2)         -- print output for val --
   print("output: ")
   print(output)
@@ -763,6 +765,8 @@ function Conv:predictCombination(lsent, rsent)
   else
     error("not possible task")
   end
+  print('val:')
+  print(val)
   return val
 end
 

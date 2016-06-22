@@ -77,9 +77,9 @@ local emb_prefix = emb_dir .. 'glove.840B'
 local emb_vocab, emb_vecs = similarityMeasure.read_embedding(emb_prefix .. '.vocab', emb_prefix .. '.300d.th')  -- both read_data.lua and Vocab.lua describe the function of read_embedding() --
 
 local emb_dim = emb_vecs:size(2)  -- emb_vecs represents embedding matrix, size() means row * column, so size(2) is the dimension of vector --
-print('row:')
+--print('row:')
 print(emb_vecs:size(1))
-print('column:')
+--print('column:')
 print(emb_vecs:size(2))
 
 -- use only vectors in vocabulary (not necessary, but gives faster training)
@@ -138,7 +138,7 @@ print('model:')
 print(model)
 
 -- number of epochs to train
-local num_epochs = 30
+local num_epochs = 5
 
 -- print information
 header('model configuration')
@@ -183,7 +183,7 @@ for i = 1, num_epochs do
     --printf('[[BEST DEV]]-- test score: %.4f\n', pearson(test_predictions, test_dataset.labels))
 
     local predictions_save_path = string.format(
-    similarityMeasure.predictions_dir .. '/results-%s.%dl.%dd.epoch-%d.%.5f.%d.pred', args.model, args.layers, args.dim, i, test_sco, id)
+    similarityMeasure.predictions_dir .. '/results-%s.%dl.%dd.epoch-%d.%.5f.%d.pred', 'ConvOnly', "1", "300", i, test_sco, id)
     local predictions_file = torch.DiskFile(predictions_save_path, 'w')
     print('writing predictions to ' .. predictions_save_path)
     for i = 1, test_predictions:size(1) do
