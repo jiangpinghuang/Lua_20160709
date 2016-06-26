@@ -10,7 +10,6 @@ function PIT:__init(config)
   self.batchSize        = config.batchSize        or 25
 end
 
-
 local function config()
   local layer = 1
   local dim = 300
