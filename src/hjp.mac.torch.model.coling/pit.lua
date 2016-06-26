@@ -20,10 +20,26 @@ function PIT:readLabel(path)
 
 end
 
-function PIT:readData()
-  local trainData
-  local devData
-  local testData
+function PIT:readData(dir, vocab)
+  local dataset = {}
+  dataset.vocab = vocab
+  dataset.lsent = PIT.readSent(dir .. 'l.toks', vocab)
+  dataset.rsent = PIT.readSent(dir .. 'r.toks', vocab)
+  dataset.size  = #dataset.lsent
+  local id = torch.DiskFile(dir .. 'id.txt')
+  local sim = torch.DiskFile(dir .. 'sim.txt')
+  dataset.ids = torch.IntTensor(dataset.size)
+  dataset.labels = torch.Tensor(dataset.size)
+  
+  for i = 1, dataset.size do
+    dataset.ids[i] = id:readInt() 
+    dataset.labels[i] = sim:readDouble()
+  end
+  
+  id:close()
+  sim:close()
+  
+  return dataset
 end
 
 function PIT:__init(config)
