@@ -2,6 +2,30 @@
 
 local PIT = torch.class('PIT')
 
+local function header(s)
+  print(string.rep('-', 80))
+  print(s)
+  print(string.rep('-', 80))
+end 
+
+function PIT:readEmb(vocab, emb)
+
+end
+
+function PIT:readSent(path, vocab)
+
+end
+
+function PIT:readLabel(path)
+
+end
+
+function PIT:readData()
+  local trainData
+  local devData
+  local testData
+end
+
 function PIT:__init(config)
   self.layer            = config.layer            or 1
   self.dim              = config.dim              or 300
@@ -52,4 +76,8 @@ local function main()
   local vector = '/home/hjp/Workshop/Model/coling/pit/embedding.txt'
   local model = '/home/hjp/Workshop/Model/coling/pit/model'
   local result = '/home/hjp/Workshop/Model/coling/pit/result.txt'
+  
+  header('demo')
 end
+
+main()
