@@ -8,16 +8,43 @@ local function header(s)
   print(string.rep('-', 80))
 end 
 
+local function sentSplit(sent, sep)
+  local tokens = {}  
+  while (true) do
+    local pos = string.find(sent, sep)
+    if (not pos) then
+      tokens[#tokens + 1] = sent
+      break
+    end
+    local token = string.sub(sent, 1, pos - 1)
+    tokens[#tokens + 1] = token
+    sent = string.sub(sent, pos + 1, #sent)
+  end  
+  return tokens
+end
+
 function PIT:readEmb(vocab, emb)
 
 end
 
 function PIT:readSent(path, vocab)
-
-end
-
-function PIT:readLabel(path)
-
+  local sents = {}
+  local file = io.open(path, 'r')
+  local line  
+  while true do
+    line = file:read()
+    if line == nil then break end
+    local tokens = strSplit(line, " ")
+    local len = #tokens
+    local sent = torch.IntTensor(len)
+    for i = 1, len do
+      local token = tokens[i]
+      sent[i] = vocab:index(token)
+    end
+    sents[#sents + 1] = sent
+  end  
+  file:close()
+  return sents
 end
 
 function PIT:readData(dir, vocab)
@@ -29,16 +56,13 @@ function PIT:readData(dir, vocab)
   local id = torch.DiskFile(dir .. 'id.txt')
   local sim = torch.DiskFile(dir .. 'sim.txt')
   dataset.ids = torch.IntTensor(dataset.size)
-  dataset.labels = torch.Tensor(dataset.size)
-  
+  dataset.labels = torch.Tensor(dataset.size)  
   for i = 1, dataset.size do
     dataset.ids[i] = id:readInt() 
     dataset.labels[i] = sim:readDouble()
-  end
-  
+  end  
   id:close()
-  sim:close()
-  
+  sim:close()  
   return dataset
 end
 
@@ -94,6 +118,7 @@ local function main()
   local result = '/home/hjp/Workshop/Model/coling/pit/result.txt'
   
   header('demo')
+  sentSplit("A hello world in Lua !", " ")
 end
 
 main()
