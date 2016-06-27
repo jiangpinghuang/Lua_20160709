@@ -1,8 +1,16 @@
 -- SemEval-2015 Task1 PIT
 
+require('torch')
+require('nn')
+require('nngraph')
+require('optim')
+require('xlua')
+require('sys')
+require('lfs')
+
 PIT = {}
 
-include()
+include('Dict.lua')
 
 local function header(s)
   print(string.rep('-', 80))
@@ -10,7 +18,7 @@ local function header(s)
   print(string.rep('-', 80))
 end 
 
-local function sentSplit(sent, sep)
+function PIT.sentSplit(sent, sep)
   local tokens = {}  
   while (true) do
     local pos = string.find(sent, sep)
@@ -25,20 +33,20 @@ local function sentSplit(sent, sep)
   return tokens
 end
 
-function PIT:readEmb(voc, emb)
-  local vocab = Dict(voc)
+function PIT.readEmb(voc, emb)
+  local vocab = PIT.Dict(voc)
   local embed = torch.load(emb)
   return vocab, embed
 end
 
-function PIT:readSent(path, vocab)
+function PIT.readSent(path, vocab)
   local sents = {}
   local file = io.open(path, 'r')
   local line  
   while true do
     line = file:read()
     if line == nil then break end
-    local tokens = strSplit(line, " ")
+    local tokens = PIT.sentSplit(line, " ")
     local len = #tokens
     local sent = torch.IntTensor(len)
     for i = 1, len do
@@ -51,11 +59,11 @@ function PIT:readSent(path, vocab)
   return sents
 end
 
-function PIT:readData(dir, vocab)
+function PIT.readData(dir, vocab)
   local dataset = {}
   dataset.vocab = vocab
-  dataset.lsent = PIT.readSent(dir .. 'l.toks', vocab)
-  dataset.rsent = PIT.readSent(dir .. 'r.toks', vocab)
+  dataset.lsent = PIT.readSent(dir .. 'ls.toks', vocab)
+  dataset.rsent = PIT.readSent(dir .. 'rs.toks', vocab)
   dataset.size  = #dataset.lsent
   local id = torch.DiskFile(dir .. 'id.txt')
   local sim = torch.DiskFile(dir .. 'sim.txt')
@@ -86,19 +94,19 @@ local function config()
   local batchSize = 25
 end
 
-function PIT:train(train)
+function PIT.train(train)
 
 end
 
-function PIT:trainDev(train, dev)
+function PIT.trainDev(train, dev)
 
 end
 
-function PIT:predict(model, test)
+function PIT.predict(model, test)
 
 end
 
-function PIT:save(model)
+function PIT.save(model)
   local config = {
     layer         = self.layer,
     dim           = self.dim,
@@ -113,17 +121,38 @@ function PIT:save(model)
 end
 
 local function main()
-  --local dir = '/home/hjp/Workshop/Model/coling/'
+  header('Loading vectors...')
+  local vocDir = '/home/hjp/Workshop/Model/coling/pit/vocabs.txt'
+  local vocab = PIT.Dict(vocDir)
   local eVocDir = '/home/hjp/Workshop/Model/coling/vec/twitter.vocab'
   local eDimDir = '/home/hjp/Workshop/Model/coling/vec/twitter.th'
-  local eVoc, eDim = PIT.readEmb(eVocDir, eDimDir)
-  print('emb_size: ')
-  print(eDim:size(2))
+  local eVoc, eVec = PIT.readEmb(eVocDir, eDimDir)
+  local dimSize = eVec:size(2)
   
+  local vecs = torch.Tensor(vocab.size, dimSize)
+  for i = 1, vocab.size do
+    local w = vocab:token(i)
+    if eVoc:contains(w) then
+      vecs[i] = eVec[eVoc:index(w)]
+    else
+      vecs[i]:uniform(-0.05, 0.05)
+    end
+  end
 
-  local train = '/home/hjp/Workshop/Model/coling/pit/train.txt'
-  local dev = '/home/hjp/Workshop/Model/coling/pit/dev.txt'
-  local test = '/home/hjp/Workshop/Model/coling/pit/test.txt'
+  eVoc, eVec = nil, nil
+  collectgarbage()
+
+  header('Loading datasets...')
+  local trainDir = '/home/hjp/Workshop/Model/coling/pit/train/'
+  local devDir = '/home/hjp/Workshop/Model/coling/pit/dev/'
+  local testDir = '/home/hjp/Workshop/Model/coling/pit/test/'
+  local trainSet = PIT.readData(trainDir,vocab)
+  local devSet = PIT.readData(devDir,vocab)
+  local testSet = PIT.readData(testDir,vocab)
+  print('train size: ' .. trainSet.size)
+  print('dev size: ' .. devSet.size)
+  print('test size: ' .. testSet.size)
+  
   local vocab = '/home/hjp/Workshop/Model/coling/pit/vocab.txt'
   local vector = '/home/hjp/Workshop/Model/coling/pit/embedding.txt'
   local model = '/home/hjp/Workshop/Model/coling/pit/model'
@@ -131,7 +160,6 @@ local function main()
   local evoc = '/home/hjp/Workshop'
   
   header('demo')
-  sentSplit("A hello world in Lua !", " ")
 end
 
 main()

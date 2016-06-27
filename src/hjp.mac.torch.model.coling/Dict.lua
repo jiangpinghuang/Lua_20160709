@@ -1,4 +1,4 @@
-local Dict = torch.class('Dict')
+local Dict = torch.class('PIT.Dict')
 
 function Dict:__init(path)
   self.size = 0
