@@ -1,6 +1,8 @@
 -- SemEval-2015 Task1 PIT
 
-local PIT = torch.class('PIT')
+PIT = {}
+
+include()
 
 local function header(s)
   print(string.rep('-', 80))
@@ -23,8 +25,10 @@ local function sentSplit(sent, sep)
   return tokens
 end
 
-function PIT:readEmb(vocab, emb)
-
+function PIT:readEmb(voc, emb)
+  local vocab = Dict(voc)
+  local embed = torch.load(emb)
+  return vocab, embed
 end
 
 function PIT:readSent(path, vocab)
@@ -109,6 +113,14 @@ function PIT:save(model)
 end
 
 local function main()
+  --local dir = '/home/hjp/Workshop/Model/coling/'
+  local eVocDir = '/home/hjp/Workshop/Model/coling/vec/twitter.vocab'
+  local eDimDir = '/home/hjp/Workshop/Model/coling/vec/twitter.th'
+  local eVoc, eDim = PIT.readEmb(eVocDir, eDimDir)
+  print('emb_size: ')
+  print(eDim:size(2))
+  
+
   local train = '/home/hjp/Workshop/Model/coling/pit/train.txt'
   local dev = '/home/hjp/Workshop/Model/coling/pit/dev.txt'
   local test = '/home/hjp/Workshop/Model/coling/pit/test.txt'
@@ -116,6 +128,7 @@ local function main()
   local vector = '/home/hjp/Workshop/Model/coling/pit/embedding.txt'
   local model = '/home/hjp/Workshop/Model/coling/pit/model'
   local result = '/home/hjp/Workshop/Model/coling/pit/result.txt'
+  local evoc = '/home/hjp/Workshop'
   
   header('demo')
   sentSplit("A hello world in Lua !", " ")
