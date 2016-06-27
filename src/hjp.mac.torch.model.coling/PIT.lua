@@ -18,6 +18,12 @@ local function header(s)
   print(string.rep('-', 80))
 end 
 
+local function pearson(x, y)
+  x = x - x:mean()
+  y = y - y:mean()
+  return x:dot(y) / (x:norm() * y:norm()) 
+end
+
 function PIT.sentSplit(sent, sep)
   local tokens = {}  
   while (true) do
@@ -153,11 +159,25 @@ local function main()
   print('dev size: ' .. devSet.size)
   print('test size: ' .. testSet.size)
   
-  local vocab = '/home/hjp/Workshop/Model/coling/pit/vocab.txt'
-  local vector = '/home/hjp/Workshop/Model/coling/pit/embedding.txt'
-  local model = '/home/hjp/Workshop/Model/coling/pit/model'
-  local result = '/home/hjp/Workshop/Model/coling/pit/result.txt'
-  local evoc = '/home/hjp/Workshop'
+  local modelName, modelClass, modelStruct
+  modelName   = 'Conv'
+  modelClass  = PIT.Conv
+  modelStruct = modelName
+  
+  local config = {
+    layer = 1,
+    dims  = 300
+  }
+  
+  local model = modelClass{
+    embVec  = vecs,
+    struct  = modelStruct,
+    layers  = config.layer,
+    vecDim  = config.dims
+  }
+  
+  
+  
   
   header('demo')
 end
