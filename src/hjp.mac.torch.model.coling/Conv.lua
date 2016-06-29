@@ -231,7 +231,15 @@ end
     --dofile "PaddingReshape.lua"
     
     deepQuery=nn.Sequential()
-    D = Dsize 
+    D = Dsize     -- 300 --
+    print('Dsize: ')
+    print(Dsize)
+
+    print('NumFilter: ')
+    print(NumFilter)
+
+    print('dw: ')
+    print(dw)
       
     -- max part for comparing --  
     local incep1max = nn.Sequential()
@@ -241,12 +249,12 @@ end
       else 
         incep1max:add(nn.Tanh())
       end     
-      incep1max:add(nn.Max(1))
+      incep1max:add(nn.Max(1))      -- the max value in column
       incep1max:add(nn.Reshape(NumFilter,1))      
       local incep2max = nn.Sequential()
       incep2max:add(nn.Max(1))
       incep2max:add(nn.Reshape(NumFilter,1))        
-      local combineDepth = nn.Concat(2)
+      local combineDepth = nn.Concat(2)   -- expand column by concating rows -- 
       combineDepth:add(incep1max)
       combineDepth:add(incep2max)
       
@@ -256,17 +264,17 @@ end
         if not noExtra then
           incepMax:add(nn.TemporalConvolution(D,D,1,dw)) -- set
           if pR == 1 then
-          incepMax:add(nn.PReLU())
-        else 
-          incepMax:add(nn.Tanh())
-        end
+            incepMax:add(nn.PReLU())
+          else 
+            incepMax:add(nn.Tanh())
+          end
         end
         incepMax:add(nn.TemporalConvolution(D,NumFilter,cc,dw))
         if pR == 1 then
           incepMax:add(nn.PReLU())
-      else 
+        else 
           incepMax:add(nn.Tanh())
-      end
+        end
         incepMax:add(nn.Max(1))
         incepMax:add(nn.Reshape(NumFilter,1))               
         combineDepth:add(incepMax)        
