@@ -240,6 +240,9 @@ end
 
     print('dw: ')
     print(dw)
+    
+    print("kW: ")
+    print(kW)
       
     -- max part for comparing --  
     local incep1max = nn.Sequential()
