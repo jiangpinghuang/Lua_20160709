@@ -360,6 +360,7 @@ end
       for cc = 1, ngram do
         local perConcept = nn.Sequential()
         perConcept:add(nn.PaddingReshape(2,2)) --set
+        print(perConcept)
         perConcept:add(nn.SpatialConvolutionMM(1,conceptFNum,1,ngram)) --set
         perConcept:add(nn.Max(2)) --set
         if pR == 1 then
